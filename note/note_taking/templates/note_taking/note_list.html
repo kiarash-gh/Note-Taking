@@ -1,0 +1,16 @@
+{% extends "main.html" %}
+
+
+{% block content %}
+
+
+    <a href="{% url 'create-note' %}">Create New Note</a>
+
+    {% for note in notes %}
+        <div>
+            <a href={% url 'note-detail' note.id %}>{{note.title}} - {{note.created}}</a>
+        </div>
+
+    {% endfor %}
+
+{% endblock content %}
