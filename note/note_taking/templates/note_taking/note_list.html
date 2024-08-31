@@ -8,7 +8,12 @@
 
     {% for note in notes %}
         <div>
+            <a href={% url 'edit-note' note.id %}>Edit Note</a>
+        </div>
+
+        <div>
             <a href={% url 'note-detail' note.id %}>{{note.title}} - {{note.created}}</a>
+            <hr>
         </div>
 
     {% endfor %}

@@ -26,3 +26,26 @@ def create_note(request):
     
     context = {'form': form}
     return render(request, 'note_taking/create_note.html', context)
+
+
+def note_detail(request, pk):
+    note = Note.objects.get(id=pk)
+    form = NoteForm(instance=note)
+    context= {'form': form}
+    return render(request, 'note_taking/note_detail.html', context)
+
+
+def update_note(request, pk):
+    note = Note.objects.get(id=pk)
+    if request.method == 'POST':
+        form = NoteForm(request.POST, instance=note)
+        if form.is_valid():
+            form.save()
+            return redirect('note-list')
+    else:
+        form = NoteForm(instance=note)  
+
+    context= {'form': form}
+    return render(request, 'note_taking/edit_note.html', context)
+
+    
