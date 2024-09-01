@@ -1,0 +1,13 @@
+{% extends "main.html" %}
+
+{% block content %}
+<h3>Are you sure you want to delete "{{ obj }}"?</h3>
+<div class="d-flex">
+<form method="post" action="">
+    {% csrf_token %}
+    <input type="submit" value="Confirm" class="btn btn-primary"/>
+</form>
+
+<a href="{{ request.META.HTTP_REFERER }}" class="btn btn-danger">Cancel</a>
+</div>
+{% endblock content %}

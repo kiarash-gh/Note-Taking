@@ -4,12 +4,19 @@
 {% block content %}
 
 
-    <a href="{% url 'create-note' %}">Create New Note</a>
+    <a href="{% url 'create-note' %}" class="btn btn-success">Create New Note</a>
 
     {% for note in notes %}
+    <div class="flex d-flex">
         <div>
-            <a href={% url 'edit-note' note.id %}>Edit Note</a>
+            <a href={% url 'edit-note' note.id %} class="btn btn-primary">Edit Note</a>
         </div>
+
+        <div>
+            <a href={% url 'delete-note' note.id %} class="btn btn-danger">Delete Note</a>
+        </div>
+
+    </div>
 
         <div>
             <a href={% url 'note-detail' note.id %}>{{note.title}} - {{note.created}}</a>
