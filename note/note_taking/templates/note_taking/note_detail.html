@@ -1,16 +1,9 @@
 {% extends "main.html" %}
 
-
 {% block content %}
 <form method="get" action="">
-
-    
-
-    {{form.as_p}}
-
-    
-    
-
+    {{ form.as_p }}
 </form>
 
+<a href="{% url 'generate-pdf' note.id %}" class="btn btn-success">Generate PDF</a>
 {% endblock content %}

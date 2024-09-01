@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect,get_object_or_404
+from django.http import FileResponse
+from reportlab.pdfgen import canvas
 from django.template import RequestContext
+from io import BytesIO
 from .models import Note
 from .forms import NoteForm
 
@@ -34,7 +37,7 @@ def create_note(request):
 def note_detail(request, pk):
     note = get_object_or_404(Note, id=pk)
     form = NoteForm(instance=note)
-    context= {'form': form}
+    context= {'form': form, 'note': note}
     return render(request, 'note_taking/note_detail.html', context)
 
 
@@ -60,3 +63,30 @@ def delete_note(request, pk):
         return redirect('note-list')
     
     return render(request, 'note_taking/delete.html', context)
+
+
+def generate_pdf(request, pk):
+    note = get_object_or_404(Note, id=pk)
+    
+    response = FileResponse(generate_pdf_file(note), 
+                            as_attachment=True, 
+                            filename=f'{note.title} - {note.created}.pdf')
+    return response
+
+def generate_pdf_file(note):
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer)
+ 
+    # Add content to the PDF
+    p.drawString(100, 750, "Note Details")
+    
+    y = 700
+    
+    p.drawString(100, y, f"Title: {note.title}")
+    p.drawString(100, y - 20, f"Note: {note.note}")
+    
+    p.showPage()
+    p.save()
+ 
+    buffer.seek(0)
+    return buffer
