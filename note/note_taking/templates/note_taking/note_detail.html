@@ -1,6 +1,10 @@
 {% extends "main.html" %}
 
 {% block content %}
+<div>
+    <a href={% url 'edit-note' note.id %} class="btn btn-primary">Edit Note</a>
+</div>
+
 <form method="get" action="">
     {{ form.as_p }}
 </form>
