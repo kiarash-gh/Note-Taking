@@ -1,0 +1,23 @@
+{% extends "main.html" %}
+
+{% block content %}
+<a href="{% url 'create-note-type' %}" class="btn btn-success">Create New Note Type</a>
+{% for type in note_types %}
+<div class="flex d-flex">
+    <div>
+        <a href={% url 'edit-note-type' type.id %} class="btn btn-primary">Edit Note Type</a>
+    </div>
+
+    <div>
+        <a href={% url 'delete-note-type' type.id %} class="btn btn-danger">Delete Note Type</a>
+    </div>
+
+</div>
+
+<div>
+    <a href="{% url 'note-type-detail' type.id %}">{{type.name}}</a>
+    <hr>
+</div>
+
+{% endfor %}
+{% endblock content %}

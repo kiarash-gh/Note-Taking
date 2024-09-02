@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect,get_object_or_404
-from django.http import FileResponse
+from django.http import FileResponse, Http404
 from reportlab.pdfgen import canvas
 from django.template import RequestContext
 from io import BytesIO
-from .models import Note
-from .forms import NoteForm
+from .models import Note, NoteType
+from .forms import NoteForm,NoteTypeForm
+from note import renderers
 
 
 # Create your views here.
@@ -67,26 +68,75 @@ def delete_note(request, pk):
 
 def generate_pdf(request, pk):
     note = get_object_or_404(Note, id=pk)
-    
-    response = FileResponse(generate_pdf_file(note), 
-                            as_attachment=True, 
-                            filename=f'{note.title} - {note.created}.pdf')
+    context = {
+        "note": note
+    }
+    response = renderers.render_to_pdf("pdf/note_pdf.html", context)
+    if response.status_code == 404:
+        raise HTTP404("Note not found")
+
+    filename = f"{note.title}.pdf"
+    """
+    Tell browser to view inline (default)
+    """
+    content = f"inline; filename={filename}"
+    download = request.GET.get("download")
+    if download:
+        """
+        Tells browser to initiate download
+        """
+        content = f"attachment; filename={filename}"
+    response["Content-Disposition"] = content
     return response
 
-def generate_pdf_file(note):
-    buffer = BytesIO()
-    p = canvas.Canvas(buffer)
- 
-    # Add content to the PDF
-    p.drawString(100, 750, "Note Details")
+
+
+# list, create, edit and delete Note Types
+def note_type_list(request):
+    note_types = NoteType.objects.all()
+    context ={'note_types': note_types}
+    return render(request, 'note_taking/note_type_list.html', context)
+
+
+def create_note_type(request):
+    form = NoteTypeForm()
+    if request.method == 'POST':
+        form = NoteTypeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('note-type-list')
+        
+    context = {'form': form}
+
+    return render(request, 'note_taking/create_note_type.html', context)
+
+
+
+def note_type_detail(request, pk):
+    note_type = get_object_or_404(NoteType, id=pk)
+    form = NoteTypeForm(instance=note_type)
+    context= {'form': form, 'note_type': note_type}
+    return render(request, 'note_taking/note_type_detail.html', context)
+
+
+def update_note_type(request, pk):
+    note_type = get_object_or_404(NoteType, id=pk)
+    form = NoteTypeForm(instance=note_type)  
+    if request.method == 'POST':
+        form = NoteTypeForm(request.POST, instance=note_type)
+        if form.is_valid():
+            form.save()
+            return redirect('note-type-list')
+    context= {'form': form}
+    return render(request, 'note_taking/edit_note_type.html', context)
+
+
+def delete_note_type(request, pk):
+    note_type = get_object_or_404(NoteType, id=pk)
+    context = {'obj': note_type.name}
+    if request.method == 'POST':        
+        note_type.delete()
+        return redirect('note-type-list')
     
-    y = 700
-    
-    p.drawString(100, y, f"Title: {note.title}")
-    p.drawString(100, y - 20, f"Note: {note.note}")
-    
-    p.showPage()
-    p.save()
- 
-    buffer.seek(0)
-    return buffer
+    return render(request, 'note_taking/delete.html', context)
+
