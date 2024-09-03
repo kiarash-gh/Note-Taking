@@ -1,6 +1,47 @@
 {% extends "main.html" %}
 
-{% block content %}
 
-    <h2>Home</h2>
+{% block content %}
+<style>
+    .wrapper {
+        padding: 20px;
+        background: #eaeaea;
+        max-width: 700px;
+        margin: 50px auto;
+        border-radius: 20px;
+      }
+      
+      .note-content {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+      }
+</style>
+
+   {% for note in notes  %}
+
+   <div class="wrapper">
+
+        <div>
+            <div>
+                <h5>{{note.title}}</h5>
+            </div>
+            <div>
+                <p>{{note.note_type}}</p>
+            </div>
+            <div>
+                <p>{{note.created}}</p>
+            </div>
+        </div>
+
+        <div class="note-content">
+            {{note.note}}
+        </div>
+        <div>
+            <a href={% url 'note-detail' note.id %}>View Note</a>
+        </div>
+
+   </div>   
+   {% endfor %}
 {% endblock content %}

@@ -12,7 +12,8 @@ from note import renderers
 
 
 def home(request):
-    context = {}
+    notes = Note.objects.order_by('-created')[:4]
+    context = {'notes': notes}
     return render(request, 'note_taking/home.html', context)
 
 
@@ -69,24 +70,24 @@ def delete_note(request, pk):
 def generate_pdf(request, pk):
     note = get_object_or_404(Note, id=pk)
     context = {
-        "note": note
+        'note': note
     }
-    response = renderers.render_to_pdf("pdf/note_pdf.html", context)
+    response = renderers.render_to_pdf('pdf/note_pdf.html', context)
     if response.status_code == 404:
-        raise HTTP404("Note not found")
+        raise HTTP404('Note not found')
 
-    filename = f"{note.title}.pdf"
+    filename = f'{note.title}.pdf'
     """
     Tell browser to view inline (default)
     """
-    content = f"inline; filename={filename}"
-    download = request.GET.get("download")
+    content = f'inline; filename={filename}'
+    download = request.GET.get('download')
     if download:
         """
         Tells browser to initiate download
         """
-        content = f"attachment; filename={filename}"
-    response["Content-Disposition"] = content
+        content = f'attachment; filename={filename}'
+    response['Content-Disposition'] = content
     return response
 
 
